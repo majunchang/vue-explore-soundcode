@@ -1,7 +1,7 @@
 /* @flow */
 
-import VNode, { createTextVNode } from 'core/vdom/vnode'
-import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
+import VNode, { createTextVNode } from '../../../core/vdom/vnode'
+import { isFalse, isTrue, isDef, isUndef, isPrimitive } from '../../../shared/util'
 
 // The template compiler attempts to minimize the need for normalization by
 // statically analyzing the template at compile time.
@@ -15,7 +15,7 @@ import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
 // normalization is needed - if any child is an Array, we flatten the whole
 // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
 // because functional components already normalize their own children.
-export function simpleNormalizeChildren (children: any) {
+export function simpleNormalizeChildren(children: any) {
   for (let i = 0; i < children.length; i++) {
     if (Array.isArray(children[i])) {
       return Array.prototype.concat.apply([], children)
@@ -28,7 +28,7 @@ export function simpleNormalizeChildren (children: any) {
 // e.g. <template>, <slot>, v-for, or when the children is provided by user
 // with hand-written render functions / JSX. In such cases a full normalization
 // is needed to cater to all possible types of children values.
-export function normalizeChildren (children: any): ?Array<VNode> {
+export function normalizeChildren(children: any): ?Array<VNode> {
   return isPrimitive(children)
     ? [createTextVNode(children)]
     : Array.isArray(children)
@@ -36,11 +36,11 @@ export function normalizeChildren (children: any): ?Array<VNode> {
       : undefined
 }
 
-function isTextNode (node): boolean {
+function isTextNode(node): boolean {
   return isDef(node) && isDef(node.text) && isFalse(node.isComment)
 }
 
-function normalizeArrayChildren (children: any, nestedIndex?: string): Array<VNode> {
+function normalizeArrayChildren(children: any, nestedIndex?: string): Array<VNode> {
   const res = []
   let i, c, lastIndex, last
   for (i = 0; i < children.length; i++) {

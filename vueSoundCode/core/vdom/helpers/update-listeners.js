@@ -1,7 +1,7 @@
 /* @flow */
 
-import { warn } from 'core/util/index'
-import { cached, isUndef } from 'shared/util'
+import { warn } from '../../../core/util/index'
+import { cached, isUndef } from '../../../shared/util'
 
 const normalizeEvent = cached((name: string): {
   name: string,
@@ -23,8 +23,8 @@ const normalizeEvent = cached((name: string): {
   }
 })
 
-export function createFnInvoker (fns: Function | Array<Function>): Function {
-  function invoker () {
+export function createFnInvoker(fns: Function | Array<Function>): Function {
+  function invoker() {
     const fns = invoker.fns
     if (Array.isArray(fns)) {
       const cloned = fns.slice()
@@ -40,7 +40,7 @@ export function createFnInvoker (fns: Function | Array<Function>): Function {
   return invoker
 }
 
-export function updateListeners (
+export function updateListeners(
   on: Object,
   oldOn: Object,
   add: Function,

@@ -1,11 +1,11 @@
 /* @flow */
 
-import { isObject, isDef } from 'core/util/index'
+import { isObject, isDef } from '../../../core/util/index'
 
 /**
  * Runtime helper for rendering v-for lists.
  */
-export function renderList (
+export function renderList(
   val: any,
   render: (
     val: any,

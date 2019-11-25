@@ -1,8 +1,8 @@
 /* @flow */
 
 import VNode from './vnode'
-import { resolveConstructorOptions } from 'core/instance/init'
-import { queueActivatedComponent } from 'core/observer/scheduler'
+import { resolveConstructorOptions } from '../../core/instance/init'
+import { queueActivatedComponent } from '../../core/observer/scheduler'
 import { createFunctionalComponent } from './create-functional-component'
 
 import {
@@ -29,7 +29,7 @@ import {
 
 // hooks to be invoked on component VNodes during patch
 const componentVNodeHooks = {
-  init (
+  init(
     vnode: VNodeWithData,
     hydrating: boolean,
     parentElm: ?Node,
@@ -50,7 +50,7 @@ const componentVNodeHooks = {
     }
   },
 
-  prepatch (oldVnode: MountedComponentVNode, vnode: MountedComponentVNode) {
+  prepatch(oldVnode: MountedComponentVNode, vnode: MountedComponentVNode) {
     const options = vnode.componentOptions
     const child = vnode.componentInstance = oldVnode.componentInstance
     updateChildComponent(
@@ -62,7 +62,7 @@ const componentVNodeHooks = {
     )
   },
 
-  insert (vnode: MountedComponentVNode) {
+  insert(vnode: MountedComponentVNode) {
     const { context, componentInstance } = vnode
     if (!componentInstance._isMounted) {
       componentInstance._isMounted = true
@@ -82,7 +82,7 @@ const componentVNodeHooks = {
     }
   },
 
-  destroy (vnode: MountedComponentVNode) {
+  destroy(vnode: MountedComponentVNode) {
     const { componentInstance } = vnode
     if (!componentInstance._isDestroyed) {
       if (!vnode.data.keepAlive) {
@@ -96,7 +96,7 @@ const componentVNodeHooks = {
 
 const hooksToMerge = Object.keys(componentVNodeHooks)
 
-export function createComponent (
+export function createComponent(
   Ctor: Class<Component> | Function | Object | void,
   data: ?VNodeData,
   context: Component,
@@ -194,7 +194,7 @@ export function createComponent (
   return vnode
 }
 
-export function createComponentInstanceForVnode (
+export function createComponentInstanceForVnode(
   vnode: any, // we know it's MountedComponentVNode but flow doesn't
   parent: any, // activeInstance in lifecycle state
   parentElm?: ?Node,
@@ -221,7 +221,7 @@ export function createComponentInstanceForVnode (
   return new vnodeComponentOptions.Ctor(options)
 }
 
-function mergeHooks (data: VNodeData) {
+function mergeHooks(data: VNodeData) {
   if (!data.hook) {
     data.hook = {}
   }
@@ -233,7 +233,7 @@ function mergeHooks (data: VNodeData) {
   }
 }
 
-function mergeHook (one: Function, two: Function): Function {
+function mergeHook(one: Function, two: Function): Function {
   return function (a, b, c, d) {
     one(a, b, c, d)
     two(a, b, c, d)
@@ -242,10 +242,10 @@ function mergeHook (one: Function, two: Function): Function {
 
 // transform component v-model info (value and callback) into
 // prop and event handler respectively.
-function transformModel (options, data: any) {
+function transformModel(options, data: any) {
   const prop = (options.model && options.model.prop) || 'value'
   const event = (options.model && options.model.event) || 'input'
-  ;(data.props || (data.props = {}))[prop] = data.model.value
+    ; (data.props || (data.props = {}))[prop] = data.model.value
   const on = data.on || (data.on = {})
   if (isDef(on[event])) {
     on[event] = [data.model.callback].concat(on[event])

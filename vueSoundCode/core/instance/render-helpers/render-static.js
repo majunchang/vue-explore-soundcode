@@ -1,11 +1,11 @@
 /* @flow */
 
-import { cloneVNode, cloneVNodes } from 'core/vdom/vnode'
+import { cloneVNode, cloneVNodes } from '../../../core/vdom/vnode'
 
 /**
  * Runtime helper for rendering static trees.
  */
-export function renderStatic (
+export function renderStatic(
   index: number,
   isInFor?: boolean
 ): VNode | Array<VNode> {
@@ -31,7 +31,7 @@ export function renderStatic (
  * Runtime helper for v-once.
  * Effectively it means marking the node as static with a unique key.
  */
-export function markOnce (
+export function markOnce(
   tree: VNode | Array<VNode>,
   index: number,
   key: string
@@ -40,7 +40,7 @@ export function markOnce (
   return tree
 }
 
-function markStatic (
+function markStatic(
   tree: VNode | Array<VNode>,
   key: string,
   isOnce: boolean
@@ -56,7 +56,7 @@ function markStatic (
   }
 }
 
-function markStaticNode (node, key, isOnce) {
+function markStaticNode(node, key, isOnce) {
   node.isStatic = true
   node.key = key
   node.isOnce = isOnce

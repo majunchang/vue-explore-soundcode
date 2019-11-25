@@ -1,10 +1,10 @@
 /* @flow */
 
-import { ASSET_TYPES } from 'shared/constants'
+import { ASSET_TYPES } from '../../shared/constants'
 import { warn, extend, mergeOptions } from '../util/index'
 import { defineComputed, proxy } from '../instance/state'
 
-export function initExtend (Vue: GlobalAPI) {
+export function initExtend(Vue: GlobalAPI) {
   /**
    * Each instance constructor, including Vue, has a unique
    * cid. This enables us to create wrapped "child
@@ -36,7 +36,7 @@ export function initExtend (Vue: GlobalAPI) {
       }
     }
 
-    const Sub = function VueComponent (options) {
+    const Sub = function VueComponent(options) {
       this._init(options)
     }
     Sub.prototype = Object.create(Super.prototype)
@@ -86,14 +86,14 @@ export function initExtend (Vue: GlobalAPI) {
   }
 }
 
-function initProps (Comp) {
+function initProps(Comp) {
   const props = Comp.options.props
   for (const key in props) {
     proxy(Comp.prototype, `_props`, key)
   }
 }
 
-function initComputed (Comp) {
+function initComputed(Comp) {
   const computed = Comp.options.computed
   for (const key in computed) {
     defineComputed(Comp.prototype, key, computed[key])

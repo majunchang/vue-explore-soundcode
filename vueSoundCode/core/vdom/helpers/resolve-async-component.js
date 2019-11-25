@@ -8,11 +8,11 @@ import {
   isTrue,
   isObject,
   hasSymbol
-} from 'core/util/index'
+} from '../../../core/util/index'
 
-import { createEmptyVNode } from 'core/vdom/vnode'
+import { createEmptyVNode } from '../../../core/vdom/vnode'
 
-function ensureCtor (comp: any, base) {
+function ensureCtor(comp: any, base) {
   if (
     comp.__esModule ||
     (hasSymbol && comp[Symbol.toStringTag] === 'Module')
@@ -24,7 +24,7 @@ function ensureCtor (comp: any, base) {
     : comp
 }
 
-export function createAsyncPlaceholder (
+export function createAsyncPlaceholder(
   factory: Function,
   data: ?VNodeData,
   context: Component,
@@ -37,7 +37,7 @@ export function createAsyncPlaceholder (
   return node
 }
 
-export function resolveAsyncComponent (
+export function resolveAsyncComponent(
   factory: Function,
   baseCtor: Class<Component>,
   context: Component

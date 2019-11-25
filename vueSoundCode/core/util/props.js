@@ -9,7 +9,7 @@ import {
   hyphenate,
   capitalize,
   isPlainObject
-} from 'shared/util'
+} from '../../shared/util'
 
 type PropOptions = {
   type: Function | Array<Function> | null,
@@ -18,7 +18,7 @@ type PropOptions = {
   validator: ?Function
 };
 
-export function validateProp (
+export function validateProp(
   key: string,
   propOptions: Object,
   propsData: Object,
@@ -54,7 +54,7 @@ export function validateProp (
 /**
  * Get the default value of a prop.
  */
-function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): any {
+function getPropDefaultValue(vm: ?Component, prop: PropOptions, key: string): any {
   // no default, return undefined
   if (!hasOwn(prop, 'default')) {
     return undefined
@@ -87,7 +87,7 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
 /**
  * Assert whether a prop is valid.
  */
-function assertProp (
+function assertProp(
   prop: PropOptions,
   name: string,
   value: any,
@@ -139,7 +139,7 @@ function assertProp (
 
 const simpleCheckRE = /^(String|Number|Boolean|Function|Symbol)$/
 
-function assertType (value: any, type: Function): {
+function assertType(value: any, type: Function): {
   valid: boolean;
   expectedType: string;
 } {
@@ -170,12 +170,12 @@ function assertType (value: any, type: Function): {
  * because a simple equality check will fail when running
  * across different vms / iframes.
  */
-function getType (fn) {
+function getType(fn) {
   const match = fn && fn.toString().match(/^\s*function (\w+)/)
   return match ? match[1] : ''
 }
 
-function isType (type, fn) {
+function isType(type, fn) {
   if (!Array.isArray(fn)) {
     return getType(fn) === getType(type)
   }

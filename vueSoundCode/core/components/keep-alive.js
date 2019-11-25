@@ -1,15 +1,15 @@
 /* @flow */
 
-import { isRegExp, remove } from 'shared/util'
-import { getFirstComponentChild } from 'core/vdom/helpers/index'
+import { isRegExp, remove } from '../../shared/util'
+import { getFirstComponentChild } from '../../core/vdom/helpers/index'
 
 type VNodeCache = { [key: string]: ?VNode };
 
-function getComponentName (opts: ?VNodeComponentOptions): ?string {
+function getComponentName(opts: ?VNodeComponentOptions): ?string {
   return opts && (opts.Ctor.options.name || opts.tag)
 }
 
-function matches (pattern: string | RegExp | Array<string>, name: string): boolean {
+function matches(pattern: string | RegExp | Array<string>, name: string): boolean {
   if (Array.isArray(pattern)) {
     return pattern.indexOf(name) > -1
   } else if (typeof pattern === 'string') {
@@ -21,7 +21,7 @@ function matches (pattern: string | RegExp | Array<string>, name: string): boole
   return false
 }
 
-function pruneCache (keepAliveInstance: any, filter: Function) {
+function pruneCache(keepAliveInstance: any, filter: Function) {
   const { cache, keys, _vnode } = keepAliveInstance
   for (const key in cache) {
     const cachedNode: ?VNode = cache[key]
@@ -34,7 +34,7 @@ function pruneCache (keepAliveInstance: any, filter: Function) {
   }
 }
 
-function pruneCacheEntry (
+function pruneCacheEntry(
   cache: VNodeCache,
   key: string,
   keys: Array<string>,
@@ -60,27 +60,27 @@ export default {
     max: [String, Number]
   },
 
-  created () {
+  created() {
     this.cache = Object.create(null)
     this.keys = []
   },
 
-  destroyed () {
+  destroyed() {
     for (const key in this.cache) {
       pruneCacheEntry(this.cache, key, this.keys)
     }
   },
 
   watch: {
-    include (val: string | RegExp | Array<string>) {
+    include(val: string | RegExp | Array<string>) {
       pruneCache(this, name => matches(val, name))
     },
-    exclude (val: string | RegExp | Array<string>) {
+    exclude(val: string | RegExp | Array<string>) {
       pruneCache(this, name => !matches(val, name))
     }
   },
 
-  render () {
+  render() {
     const vnode: VNode = getFirstComponentChild(this.$slots.default)
     const componentOptions: ?VNodeComponentOptions = vnode && vnode.componentOptions
     if (componentOptions) {

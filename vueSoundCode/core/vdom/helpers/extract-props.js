@@ -7,9 +7,9 @@ import {
   isUndef,
   hyphenate,
   formatComponentName
-} from 'core/util/index'
+} from '../../../core/util/index'
 
-export function extractPropsFromVNodeData (
+export function extractPropsFromVNodeData(
   data: VNodeData,
   Ctor: Class<Component>,
   tag?: string
@@ -43,13 +43,13 @@ export function extractPropsFromVNodeData (
         }
       }
       checkProp(res, props, key, altKey, true) ||
-      checkProp(res, attrs, key, altKey, false)
+        checkProp(res, attrs, key, altKey, false)
     }
   }
   return res
 }
 
-function checkProp (
+function checkProp(
   res: Object,
   hash: ?Object,
   key: string,
