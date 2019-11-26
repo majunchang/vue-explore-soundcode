@@ -19,7 +19,9 @@
   "plugins": [
     "transform-vue-jsx",
     "transform-runtime",
+    "syntax-dynamic-import",
     "transform-class-properties",
-    "babel-plugin-transform-flow-strip-types"
+    "babel-plugin-transform-flow-strip-types",
+    "transform-class-properties"
   ]
 }
