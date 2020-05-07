@@ -45,6 +45,8 @@ export default class Watcher {
     cb: Function,
     options?: Object
   ) {
+    console.log('222');
+
     this.vm = vm
     vm._watchers.push(this)
     // options
