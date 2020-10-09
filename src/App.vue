@@ -1,36 +1,44 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png" />
+    <!-- <img src="./assets/logo.png" /> -->
     <h1 @click="handleClick">哈哈哈</h1>
-    <h1 @click="handleClick">{{majunchang}}</h1>
-    <h1 @click="handleClick">{{majunchang}}</h1>
-    <h1 @click="handleClick">{{test}}12</h1>
+    <h1 @click="handleClick">{{ majunchang }}</h1>
+    <h1 @click="handleClick">{{ test }}12</h1>
+    <!-- <div id="demo">{{ fullName }}</div> -->
   </div>
 </template>
 
 <script>
 export default {
-  name: "App",
-  data(){
+  name: 'App',
+  data() {
     return {
-      majunchang:'1241213',
-      test:'127',
-      arr:'123',
-    }
+      majunchang: '1241213',
+      test: '127',
+      firstName: 'Foo',
+      fullName: 'Bar',
+      // arr:'123',
+    };
+  },
+  watch: {
+    firstName: function (val) {
+      this.fullName = val + ' ' + this.majunchang;
+    },
   },
   methods: {
     handleClick() {
       this.test = '123';
-      this.majunchang = '123';
-      this.arr = '1'
-    }
-  }
+      // this.majunchang = '123';
+      // this.arr = '1';
+      // this.firstName = '前缀';
+    },
+  },
 };
 </script>
 
 <style>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
