@@ -36,6 +36,7 @@
 
   /**
    * Check if value is primitive.
+   * 判断是否为基础类型
    */
   function isPrimitive(value) {
     return (
@@ -760,9 +761,9 @@
 
   Dep.prototype.addSub = function addSub(sub) {
     this.subs.push(sub);
-    console.log(sub);
-    console.log(this);
-    console.log(this.subs);
+    // console.log(sub);
+    // console.log(this);
+    // console.log(this.subs);
   };
 
   Dep.prototype.removeSub = function removeSub(sub) {
@@ -778,9 +779,9 @@
   Dep.prototype.notify = function notify() {
     // stabilize the subscriber list first
     var subs = this.subs.slice();
-    console.log("notify");
+    // console.log("notify");
 
-    console.log(this.subs);
+    // console.log(this.subs);
     if (!config.async) {
       // subs aren't sorted in scheduler if not running async
       // we need to sort them now to make sure they fire in correct
@@ -974,7 +975,8 @@
   var Observer = function Observer(value) {
     this.value = value;
     this.dep = new Dep();
-    console.log("observe", this.dep);
+    // console.log("observe", this);
+    // console.log("observe", this.dep);
 
     this.vmCount = 0;
     def(value, "__ob__", this);
@@ -2437,9 +2439,11 @@
   // normalization is needed - if any child is an Array, we flatten the whole
   // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
   // because functional components already normalize their own children.
+  // 处理编译生成的render函数
   function simpleNormalizeChildren(children) {
     for (var i = 0; i < children.length; i++) {
       if (Array.isArray(children[i])) {
+        // 子节点为数组的时候，进行开平操作，压缩成为一维数组
         return Array.prototype.concat.apply([], children);
       }
     }
@@ -2451,6 +2455,7 @@
   // with hand-written render functions / JSX. In such cases a full normalization
   // is needed to cater to all possible types of children values.
   function normalizeChildren(children) {
+    // 递归调用，直到子节点是基础类型 则调用createTextVNode 创建文本节点vnode
     return isPrimitive(children)
       ? [createTextVNode(children)]
       : Array.isArray(children)
@@ -2686,8 +2691,7 @@
         res && typeof res === "object" && !Array.isArray(res)
           ? [res] // single vnode
           : normalizeChildren(res);
-      return res &&
-        (res.length === 0 || (res.length === 1 && res[0].isComment)) // #9658
+      return res && (res.length === 0 || (res.length === 1 && res[0].isComment)) // #9658
         ? undefined
         : res;
     };
@@ -3245,9 +3249,14 @@
       return;
     }
 
+    /*
+      Vue.options._base = Vue;
+      Vue.options里的_base属性存储Vue构造器
+    */
     var baseCtor = context.$options._base;
 
     // plain options object: turn it into a constructor
+    // 针对局部组件注册场景
     if (isObject(Ctor)) {
       Ctor = baseCtor.extend(Ctor);
     }
@@ -3284,6 +3293,7 @@
 
     // resolve constructor options in case global mixins are applied after
     // component constructor creation
+    // 构造器配置合并
     resolveConstructorOptions(Ctor);
 
     // transform component v-model data into props & events
@@ -3325,10 +3335,12 @@
     }
 
     // install component management hooks onto the placeholder node
+    // 挂载组件钩子
     installComponentHooks(data);
 
     // return a placeholder vnode
     var name = Ctor.options.name || tag;
+    // 创建子组件vnode 名称以vue-component-开头
     var vnode = new VNode(
       "vue-component-" + Ctor.cid + (name ? "-" + name : ""),
       data,
@@ -3419,25 +3431,31 @@
   // wrapper function for providing a more flexible interface
   // without getting yelled at by flow
   function createElement(
-    context,
-    tag,
-    data,
-    children,
+    context, // vm实例
+    tag, // 标签
+    data, // 节点相关数据 属性
+    children, // 子节点
     normalizationType,
-    alwaysNormalize
+    alwaysNormalize // 区分内部编译生成的render还是手写的render
   ) {
+    // 对于传入的参数进行处理  如果data不符合条件  则将第三个参数作为第四个参数使用 依次类推
     if (Array.isArray(data) || isPrimitive(data)) {
       normalizationType = children;
       children = data;
       data = undefined;
     }
+    // 区分是内部编译使用的 还是用户手写render使用的
     if (isTrue(alwaysNormalize)) {
       normalizationType = ALWAYS_NORMALIZE;
     }
+    console.log(
+      _createElement(context, tag, data, children, normalizationType)
+    );
     return _createElement(context, tag, data, children, normalizationType);
   }
 
   function _createElement(context, tag, data, children, normalizationType) {
+    // 数据对象不能是定义在Vue data属性中的响应式数据
     if (isDef(data) && isDef(data.__ob__)) {
       warn(
         "Avoid using observed data object as vnode data: " +
@@ -3446,7 +3464,7 @@
           "Always create fresh vnode data objects in each render!",
         context
       );
-      return createEmptyVNode();
+      return createEmptyVNode(); // 返回注释节点
     }
     // object syntax in v-bind
     if (isDef(data) && isDef(data.is)) {
@@ -3454,9 +3472,11 @@
     }
     if (!tag) {
       // in case of component :is set to falsy value
+      // 防止动态组件 :is设置为false时 对其进行特殊处理
       return createEmptyVNode();
     }
     // warn against non-primitive key
+    // key值只能为string number这些原始数据类型
     if (isDef(data) && isDef(data.key) && !isPrimitive(data.key)) {
       {
         warn(
@@ -3473,7 +3493,9 @@
       children.length = 0;
     }
     if (normalizationType === ALWAYS_NORMALIZE) {
+      // 用户定义的render函数
       children = normalizeChildren(children);
+      // 模板编译生成的render函数
     } else if (normalizationType === SIMPLE_NORMALIZE) {
       children = simpleNormalizeChildren(children);
     }
@@ -3481,6 +3503,7 @@
     if (typeof tag === "string") {
       var Ctor;
       ns = (context.$vnode && context.$vnode.ns) || config.getTagNamespace(tag);
+      // 子节点的标签为普通的html标签 则直接创建Vnode
       if (config.isReservedTag(tag)) {
         // platform built-in elements
         if (isDef(data) && isDef(data.nativeOn)) {
@@ -3500,10 +3523,18 @@
           context
         );
       } else if (
+        // 子节点标签为注册过的组件标签名 则子组件Vnode的创建过程
         (!data || !data.pre) &&
         isDef((Ctor = resolveAsset(context.$options, "components", tag)))
       ) {
-        // component
+        // 创建子组件的Vnode
+        /**
+          Ctor: Class<Component> | Function | Object | void, 子类构造器
+          data: ?VNodeData,
+          context: Component, vm实例
+          children: ?Array<VNode>, 子节点
+          tag?: string 子组件的占位符
+         */
         vnode = createComponent(Ctor, data, context, children, tag);
       } else {
         // unknown or unlisted namespaced elements
@@ -4182,7 +4213,7 @@
     // we set this to vm._watcher inside the watcher's constructor
     // since the watcher's initial patch may call $forceUpdate (e.g. inside child
     // component's mounted hook), which relies on vm._watcher being already defined
-    console.log("1111");
+    console.log("mountComponent调用");
 
     new Watcher(
       vm,
@@ -4540,6 +4571,10 @@
    * This is used for both the $watch() api and directives.
    */
   var Watcher = function Watcher(vm, expOrFn, cb, options, isRenderWatcher) {
+    // console.log("Watcher类的this");
+    // console.log(this);
+    // console.log(this.id);
+
     this.vm = vm;
     if (isRenderWatcher) {
       vm._watcher = this;
@@ -4588,8 +4623,8 @@
    * Evaluate the getter, and re-collect dependencies.
    */
   Watcher.prototype.get = function get() {
-    console.log("get");
-
+    // console.log("Watcher.prototype.get get");
+    // console.log(this);
     pushTarget(this);
     var value;
     var vm = this.vm;
@@ -4618,10 +4653,10 @@
    */
   Watcher.prototype.addDep = function addDep(dep) {
     var id = dep.id;
-    console.log("AddDep");
+    // console.log("AddDep");
 
-    console.log(dep);
-    console.log(this.newDeps);
+    // console.log(dep);
+    // console.log(this.newDeps);
 
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id);
@@ -4658,9 +4693,9 @@
    * Will be called when a dependency changes.
    */
   Watcher.prototype.update = function update() {
-    console.log("update");
-    console.log(this.lazy);
-    console.log(this.sync);
+    // console.log("update");
+    // console.log(this.lazy);
+    // console.log(this.sync);
 
     /* istanbul ignore else */
     if (this.lazy) {
@@ -4679,6 +4714,9 @@
   Watcher.prototype.run = function run() {
     if (this.active) {
       var value = this.get();
+      // console.log("Watcher.prototype.run");
+      // console.log(this.value);
+      // console.log(this.cb);
       if (
         value !== this.value ||
         // Deep watchers and watchers on Object/Arrays should fire even
@@ -4721,8 +4759,8 @@
    */
   Watcher.prototype.depend = function depend() {
     var i = this.deps.length;
-    console.log("wathcer-----");
-    console.log(this.deps);
+    // console.log("wathcer-----");
+    // console.log(this.deps);
 
     while (i--) {
       this.deps[i].depend();
@@ -5365,21 +5403,28 @@
      * Create asset registration methods.
      */
     ASSET_TYPES.forEach(function(type) {
+      // type: component,directive,filter
       Vue[type] = function(id, definition) {
         if (!definition) {
+          // 直接返回注册组件的构造函数
           return this.options[type + "s"][id];
         } else {
           /* istanbul ignore if */
           if (type === "component") {
+            // 验证Component组件名字是否合法
             validateComponentName(id);
           }
           if (type === "component" && isPlainObject(definition)) {
+            // 组件名称设置 如果组件选项中有name属性  会对传入的第一个参数进行覆盖
             definition.name = definition.name || id;
+            // Vue.extend()创建子组件 返回子类构造器
             definition = this.options._base.extend(definition);
           }
           if (type === "directive" && typeof definition === "function") {
             definition = { bind: definition, update: definition };
           }
+          // 为Vue.options上的component属性添加子类构造器
+          // 也就是说 将组件的信息加载到实例options.components对象中
           this.options[type + "s"][id] = definition;
           return definition;
         }
@@ -6086,6 +6131,7 @@
       }
 
       vnode.isRootInsert = !nested; // for transition enter check
+      // 递归创建子组件真实节点，知道完成所有子组件的渲染才会进行根节点的真实节点插入
       if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
         return;
       }
@@ -12534,6 +12580,13 @@
       optimize(ast, options);
     }
     var code = generate(ast, options);
+    console.log(
+      JSON.stringify({
+        ast: ast,
+        render: code.render,
+        staticRenderFns: code.staticRenderFns
+      })
+    );
     return {
       ast: ast,
       render: code.render,
