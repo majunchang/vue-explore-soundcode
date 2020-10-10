@@ -762,6 +762,8 @@
   };
 
   Dep.prototype.addSub = function addSub(sub) {
+    // 将当前watcher 添加到数据依赖收集器中
+    // 这里的sub 指代Dep.target
     this.subs.push(sub);
     // console.log(sub);
     // console.log(this);
@@ -781,13 +783,11 @@
   Dep.prototype.notify = function notify() {
     // stabilize the subscriber list first
     var subs = this.subs.slice();
-    // console.log("notify");
-
-    // console.log(this.subs);
     if (!config.async) {
       // subs aren't sorted in scheduler if not running async
       // we need to sort them now to make sure they fire in correct
       // order
+      // 根据依赖的id进行排序
       subs.sort(function(a, b) {
         return a.id - b.id;
       });
@@ -1070,6 +1070,7 @@
    * Define a reactive property on an Object.
    */
   function defineReactive(obj, key, val, customSetter, shallow) {
+    // 每个数据实例化一个Dep类，创建一个依赖的管理
     var dep = new Dep();
 
     var property = Object.getOwnPropertyDescriptor(obj, key);
@@ -1083,7 +1084,7 @@
     if ((!getter || setter) && arguments.length === 2) {
       val = obj[key];
     }
-
+    // 如果对象的属性值也是一个对象，则会递归调用实例化Observe类 让其属性也转换为响应式
     var childOb = !shallow && observe(val);
     Object.defineProperty(obj, key, {
       enumerable: true,
@@ -1091,6 +1092,7 @@
       get: function reactiveGetter() {
         var value = getter ? getter.call(obj) : val;
         if (Dep.target) {
+          // 为当前的Watcher添加dep数据
           dep.depend();
           if (childOb) {
             childOb.dep.depend();
@@ -3483,9 +3485,9 @@
     if (isTrue(alwaysNormalize)) {
       normalizationType = ALWAYS_NORMALIZE;
     }
-    console.log(
-      _createElement(context, tag, data, children, normalizationType)
-    );
+    // console.log(
+    //   _createElement(context, tag, data, children, normalizationType)
+    // );
     return _createElement(context, tag, data, children, normalizationType);
   }
 
@@ -4430,6 +4432,7 @@
 
   /**
    * Reset the scheduler's state.
+   * 将一些流程控制的状态变量恢复为初始值 并清空watcher的队列
    */
   function resetSchedulerState() {
     index = queue.length = activatedChildren.length = 0;
@@ -4475,6 +4478,7 @@
 
   /**
    * Flush both queues and run the watchers.
+   *
    */
   function flushSchedulerQueue() {
     currentFlushTimestamp = getNow();
@@ -4495,8 +4499,10 @@
 
     // do not cache length because more watchers might be pushed
     // as we run existing watchers
+    // 循环执行queue.length 为了确保由于渲染时添加新的依赖导致queue的长度不断改变
     for (index = 0; index < queue.length; index++) {
       watcher = queue[index];
+      // 如果watcher定义了before的配置 则优先执行
       if (watcher.before) {
         watcher.before();
       }
@@ -4522,7 +4528,7 @@
     // keep copies of post queues before resetting state
     var activatedQueue = activatedChildren.slice();
     var updatedQueue = queue.slice();
-
+    // 重置恢复状态 清空队列
     resetSchedulerState();
 
     // call component updated and activated hooks
@@ -4572,6 +4578,7 @@
    */
   function queueWatcher(watcher) {
     var id = watcher.id;
+    // 保证同一个watcher 只会执行一次
     if (has[id] == null) {
       has[id] = true;
       if (!flushing) {
@@ -4653,6 +4660,7 @@
         );
       }
     }
+    // lazy为计算属性标志，当watcher为计算watcher时，不会理解执行get方法进行求值
     this.value = this.lazy ? undefined : this.get();
   };
 
@@ -4690,14 +4698,18 @@
    */
   Watcher.prototype.addDep = function addDep(dep) {
     var id = dep.id;
-    // console.log("AddDep");
-
+    // console.log("addDep");
     // console.log(dep);
     // console.log(this.newDeps);
 
     if (!this.newDepIds.has(id)) {
+      /*
+        newDepIds(是具有唯一成员的set结构)
+        newDeps  两者结合起来记录watcher拥有的数据
+       */
       this.newDepIds.add(id);
       this.newDeps.push(dep);
+      // 避免重复添加同一个data收集器
       if (!this.depIds.has(id)) {
         dep.addSub(this);
       }
@@ -4864,7 +4876,16 @@
     }
   }
 
+  // 将组件的props数据设置为响应式数据。
   function initProps(vm, propsOptions) {
+    console.log("initProps");
+    console.log(propsOptions);
+    console.log(vm.$options.propsData);
+    /*
+        propsData 父组件传入的真实props数据
+        props 指向vm._props的指针
+        keys 指向vm.$options._propKeys的指针 缓存
+    */
     var propsData = vm.$options.propsData || {};
     var props = (vm._props = {});
     // cache prop keys so that future props updates can iterate using Array
@@ -4909,6 +4930,9 @@
       // static props are already proxied on the component's prototype
       // during Vue.extend(). We only need to proxy props defined at
       // instantiation here.
+      /*
+        为props做一层代理  用户可以通过vm.xxx 访问到vm._props的值
+      */
       if (!(key in vm)) {
         proxy(vm, "_props", key);
       }
@@ -4978,6 +5002,7 @@
 
   function initComputed(vm, computed) {
     // $flow-disable-line
+    // 定义一个watchers变量 并将其赋值为空对象 同时将其作为指针指向vm._computedWatchers
     var watchers = (vm._computedWatchers = Object.create(null));
     // computed properties are just getters during SSR
     var isSSR = isServerRendering();
@@ -4985,6 +5010,7 @@
     for (var key in computed) {
       var userDef = computed[key];
       var getter = typeof userDef === "function" ? userDef : userDef.get;
+      // computed属性为对象时，要保证有getter方法
       if (getter == null) {
         warn('Getter is missing for computed property "' + key + '".', vm);
       }
@@ -5003,6 +5029,7 @@
       // component prototype. We only need to define computed properties defined
       // at instantiation here.
       if (!(key in vm)) {
+        // 设置为响应式数据
         defineComputed(vm, key, userDef);
       } else {
         if (key in vm.$data) {
@@ -5096,6 +5123,11 @@
           );
         }
       }
+      /*
+        vm[key] = bind(methods[key], vm)
+                = methods[key].bind(vm);
+        直接挂载到实例的属性上 可以通过vm[key]来访问
+      */
       vm[key] =
         typeof methods[key] !== "function" ? noop : bind(methods[key], vm);
     }

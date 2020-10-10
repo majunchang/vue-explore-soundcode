@@ -1,21 +1,19 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>this is component</h2>
+    <h2>{{ desc }}</h2>
   </div>
 </template>
 
 <script>
 export default {
   name: 'HelloWorld',
+  props: ['desc'],
   data() {
     return {
       msg: 'Welcome to Your Vue.js App',
-      // name: '小明',
-      // age: '18',
     };
   },
-  watch() {},
 };
 </script>
 
@@ -27,17 +25,6 @@ h2 {
 }
 
 h2 {
-  color: #42b983;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
   color: #42b983;
 }
 </style>

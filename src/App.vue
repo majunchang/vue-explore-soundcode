@@ -4,7 +4,7 @@
     <h1 @click="handleClick">哈哈哈</h1>
     <h1 @click="handleClick">{{ majunchang }}</h1>
     <h1 @click="handleClick">{{ test }}12</h1>
-    <HelloWorld></HelloWorld>
+    <HelloWorld :desc="desc"></HelloWorld>
     <!-- <div id="demo">{{ fullName }}</div> -->
   </div>
 </template>
@@ -17,6 +17,7 @@ export default {
     return {
       majunchang: '1241213',
       test: '127',
+      desc: 'this is component',
       firstName: 'Foo',
       fullName: 'Bar',
     };
