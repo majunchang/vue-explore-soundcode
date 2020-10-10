@@ -4,11 +4,13 @@
     <h1 @click="handleClick">哈哈哈</h1>
     <h1 @click="handleClick">{{ majunchang }}</h1>
     <h1 @click="handleClick">{{ test }}12</h1>
+    <HelloWorld></HelloWorld>
     <!-- <div id="demo">{{ fullName }}</div> -->
   </div>
 </template>
 
 <script>
+import HelloWorld from './components/HelloWorld';
 export default {
   name: 'App',
   data() {
@@ -17,8 +19,10 @@ export default {
       test: '127',
       firstName: 'Foo',
       fullName: 'Bar',
-      // arr:'123',
     };
+  },
+  components: {
+    HelloWorld,
   },
   watch: {
     firstName: function (val) {

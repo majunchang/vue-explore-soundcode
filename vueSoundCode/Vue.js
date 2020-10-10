@@ -363,8 +363,10 @@
 
   /**
    * Ensure a function is called only once.
+   * once函数保证这个调用函数在系统中只会调用一次
    */
   function once(fn) {
+    // 利用闭包特性将called作为标志位
     var called = false;
     return function() {
       if (!called) {
@@ -3089,6 +3091,16 @@
 
   installRenderHelpers(FunctionalRenderContext.prototype);
 
+  /**
+   *
+   *
+   * @param {*} Ctor Class<Component> 函数式组件构造器
+   * @param {*} propsData ?Object 传入组件的props
+   * @param {*} data VNodeData 占位符组件传入的attr属性
+   * @param {*} contextVm vue实例
+   * @param {*} children ?Array<VNode> 子节点
+   * @returns VNode | void
+   */
   function createFunctionalComponent(
     Ctor,
     propsData,
@@ -3099,6 +3111,7 @@
     var options = Ctor.options;
     var props = {};
     var propOptions = options.props;
+    // isDef 不为undefined 不为null
     if (isDef(propOptions)) {
       for (var key in propOptions) {
         props[key] = validateProp(key, propOptions, propsData || emptyObject);
@@ -3304,7 +3317,29 @@
     // extract props
     var propsData = extractPropsFromVNodeData(data, Ctor, tag);
 
+    // Vue.component('test3', {
+    //   // 函数式组件的标志 functional设置为true
+    //   functional: true,
+    //   props: ['msg'],
+    //   render: function (createElement, context) {
+    //     var get = function() {
+    //       return test1
+    //     }
+    //     return createElement(get(), context)
+    //   }
+    //   })
     // functional component
+    // 创建函数式组件
+    /*
+      这里说一下：
+      vue中函数式组件 不会像普通组件那样有实例化组件的过程(比如 组件的生命周期，数据管理),
+      他只会原封不动的接收传递给组件的数据做处理，并渲染需要的内容，因此可以大大降低渲染的开销
+
+      react：
+      - 无状态组件Stateless (functional) components 并不比有状态组件 stateful (class) components快
+      - React 15 的渲染性能大概比 0.14 快 25%
+      - 纯组件 Pure components 更快，因为使用shouldComponentUpdate
+    */
     if (isTrue(Ctor.options.functional)) {
       return createFunctionalComponent(
         Ctor,
@@ -3819,10 +3854,11 @@
           forceRender(true);
         }
       });
-
+      // res是返回的promise
       var res = factory(resolve, reject);
 
       if (isObject(res)) {
+        // 判断promise对象 ===> 判断是否存在then和catch 方法（function）
         if (isPromise(res)) {
           // () => Promise
           if (isUndef(factory.resolved)) {
@@ -3832,6 +3868,7 @@
           res.component.then(resolve, reject);
 
           if (isDef(res.error)) {
+            // 异步错误时组件的处理，创建错误组件的子类构造器 赋值给errorComp
             factory.errorComp = ensureCtor(res.error, baseCtor);
           }
 
@@ -6186,6 +6223,7 @@
       var i = vnode.data;
       if (isDef(i)) {
         var isReactivated = isDef(vnode.componentInstance) && i.keepAlive;
+        // 是否有钩子函数 可以作为判断是否为组件的唯一条件
         if (isDef((i = i.hook)) && isDef((i = i.init))) {
           i(vnode, false /* hydrating */);
         }
