@@ -5133,6 +5133,12 @@
     }
   }
 
+  /**
+   *
+   *
+   * @param {*} vm  Component
+   * @param {*} watch Object
+   */
   function initWatch(vm, watch) {
     for (var key in watch) {
       var handler = watch[key];
@@ -5145,7 +5151,15 @@
       }
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} vm Component
+   * @param {*} expOrFn string | Function
+   * @param {*} handler any
+   * @param {*} options Object
+   * @returns
+   */
   function createWatcher(vm, expOrFn, handler, options) {
     if (isPlainObject(handler)) {
       options = handler;
@@ -5195,6 +5209,7 @@
       options = options || {};
       options.user = true;
       var watcher = new Watcher(vm, expOrFn, cb, options);
+      // 当watch有immediate 选项的时候 立即执行cb方法，不需要等待属性变化
       if (options.immediate) {
         try {
           cb.call(vm, watcher.value);
